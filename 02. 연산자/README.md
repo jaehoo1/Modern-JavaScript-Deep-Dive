@@ -310,6 +310,166 @@ x = 1, y = 2, z = 3; // 3
 ## 7.7 그룹 연산자
 소괄호('`()`')로 피연산자를 감싸는 그룹 연산자는 자신의 피연산자인 표현식을 가장 먼저 평가한다. 따라서 그룹 연산자를 사용하면 연산자의 우선순위를 조절할 수 있다. 그룹 연산자는 연산자 우선순위가 가장 높다.
 
+<br/>
+
+## 7.8 typeof 연산자
+`typeof` 연산자는 피연산자의 데이터 타입을 문자열로 반환한다. `typeof` 연산자는 7가지 문자열 `"string"`. `"number"`, `"boolean"`, `"undefined"`, `"symbol"`, `"object"`, `"function"` 중 하나를 반환한다. `"null"`을 반환하는 경우는 없으며, 함수의 경우 `"function"`을 반환한다. 이처럼 `typeof` 연산자가 반환하는 문자열은 7개의 데이터 타입과 정확히 일치하지는 않는다.
+```javascript
+typeof ''              // -> "string"
+typeof 1               // -> "number"
+typeof NaN             // -> "number"
+typeof true            // -> "boolean"
+typeof undefined       // -> "undefined"
+typeof Symbol()        // -> "symbol"
+typeof null            // -> "object"
+typeof []              // -> "object"
+typeof {}              // -> "object"
+typeof new Date()      // -> "object"
+typeof /test/gi        // -> "object"
+typeof function () {}  // -> "function"
+```
+
+`typeof` 연산자로 `null` 값을 연산해 보면 `"null"`이 아닌 `"object"`를 반환한다는 데 주의하자. 이것은 자바스크립트의 첫 번째 버전의 버그다. 하지만 기존 코드에 영향을 줄 수 있기 때문에 아직까지 수정되지 못하고 있다.
+
+따라서 값이 `null` 타입인지 확인할 때는 `typeof` 연산자를 사용하지 말고 일치 연산자(`===`)를 사용하자.
+```javascript
+var foo = null;
+
+typeof foo === null; // -> false
+foo === null;        // -> true
+```
+
+또 하나 주의해야 할 것이 있다. 선언하지 않은 식별자를 `typeof` 연산자로 연산해 보면 `ReferenceError`가 발생하지 않고 `undefined`를 반환한다.
+```javascript
+// undeclared 식별자를 선언한 적이 없다.
+typeof undeclared; // -> undefined
+```
+
+<br/>
+
+## 7.9 지수 연산자
+ES7에서 도입된 지수 연산자는 좌항의 피연산자를 밑(base)으로, 우항의 피연산자를 지수(exponent)로 거듭 제곱하여 숫자 값을 반환한다.
+
+지수 연산자가 도입되기 이전에는 `Math.pow` 메서드를 사용했다.
+
+지수 연산자는 다음과 같은 경우 `Math.pow` 메서드보다 가독성이 좋다.
+```javascript
+// 지수 연산자의 결합 순서는 우항에서 좌항이다. 즉, 우결합성을 갖는다.
+2 ** (3 ** 2); // -> 512
+Math.pow(2, Math.pow(3, 2)); // -> 512
+```
+
+음수를 거듭제곱의 밑으로 사용해 계산하려면 다음과 같이 괄호로 묶어야 한다.
+```javascript
+-5 ** 2;
+// SyntaxError: Unary operator used immediately before exponentiation expression.
+// Parenthesis must be used to disambiguate operator precedence
+
+(-5) ** 2; // -> 25
+```
+
+지수 연산자는 다른 산술 연산자와 마찬가지로 할당 연산자와 함께 사용할 수 있다.
+```javascript
+var num = 5;
+num **= 2; // -> 25
+```
+
+지수 연산자는 이항 연산자 중에서 우선순위가 가장 높다.
+```javascript
+2 * 5 ** 2; // -> 50
+```
+
+<br/>
+
+## 7.10 그 외의 연산자
+아직 소개하지 않은 연산자는 다른 주제와 밀접하게 연관되어 있어 해당 주제를 소개하는 장에서 살펴봄
+|연산자|개요|참고|
+|---|---|---|
+|?.|옵셔널 체이닝 연산자|9.4.2절 "옵셔널 체이닝 연산자"|
+|??|null 병합 연산자|9.4.3절 "null 병합 연산자"|
+|delete|프로퍼티 삭제|10.8절 "프로퍼티 삭제"|
+|new|생성자 함수를 호출할 때 사용하여 인스턴스를 생성|17.2.6절 "new 연산자"|
+|instanceof|좌변의 객체가 우변의 생성자 함수와 연결된 인스턴스인지 판별|19.10절 "instanceof 연산자"|
+|in|프로퍼티 존재 확인|19.13.1절 "in 연산자"|
+
+<br/>
+
+## 7.11 연산자의 부수 효과
+대부분의 연산자는 다른 코드에 영향을 주지 않는다. 예를 들어, `1 * 2`는 다른 코드에 어떠한 영향도 주지 않고 새로운 값 2를 생성할 뿐이다. 하지만 일부 연산자는 다른 코드에 영향을 주는 부수 효과가 있다.
+
+부수 효과가 있는 연산자는 할당 연산자(`=`), 증가/감소 연산자(`++`/`--`), `delete` 연산자다.
+```javascript
+var x;
+
+// 할당 연산자는 변수 값이 변하는 부수 효과가 있다.
+// 이는 x 변수를 사용하는 다른 코드에 영향을 준다.
+x = 1;
+console.log(x); // 1
+
+// 증가/감소 연산자(++/--)는 피연산자의 값을 변경하는 부수 효과가 있다.
+// 피연산자 x의 값이 재할당되어 변경된다. 이는 x 변수를 사용하는 다른 코드에 영향을 준다.
+x++;
+console.log(x); // 2
+
+var o = { a: 1 };
+
+// delete 연산자는 객체의 프로퍼티를 삭제하는 부수 효과가 있다.
+// 이는 o 객체를 사용하는 다른 코드에 영향을 준다.
+delete o.a;
+console.log(o); // {}
+```
+
+<br/>
+
+## 7.12 연산자 우선순위
+|우선순위|연산자|
+|:---:|---|
+|1|()|
+|2|new(매개변수 존재), ., [](프로퍼티 접근), ()(함수 호출), ?.(옵셔널 체이닝 연산자)|
+|3|new(매개변수 미존재)|
+|4|x++, x--|
+|5|!x, +x, -x, ++x, --x, typeof, delete|
+|6|**(이항 연산자 중에서 우선순위가 가장 높다)|
+|7|*, /, %|
+|8|+, -|
+|9|<, <=, >, >=, in, instanceof|
+|10|==, !=, ===, !==|
+|11|??(null 병합 연산자)|
+|12|&&|
+|13|\|\||
+|14|? … : …|
+|15|할당 연산자(=. +=, -=, …)|
+|16|,|
+
+연산자는 종류가 많아서 우선순위를 모두 기억하기 어렵고 실수하기도 쉽다. 따라서 기억에 의존하기보다는 연산자 우선순위가 가장 높은 그룹 연산자를 사용하여 우선순위를 명시적으로 조절하는 것을 권장한다.
+```javascript
+// 그룹 연산자를 사용하여 우선순위를 명시적으로 조절
+10 * (2 + 3); // -> 50
+```
+
+<br/>
+
+## 7.13 연산자 결합 순서
+연산자 결합 순서란 연산자의 어느 쪽(좌항 또는 우항)부터 평가를 수행할 것인지를 나타내는 순서를 말한다.
+|결합 순서|연산자|
+|---|---|
+|좌항→우항|+, -, /, %, <, <=, >, >=, &&, \|\|, ., [], (), ??, ?., in, instanceof|
+|우항→좌항|++, --, 할당 연산자(=, +=, -=, …), !x, +x, -x, ++x, --x, typeof, delete, ? … : …, **|
+
+<br/>
 
 ## 공격자(질문)
-- 
+- 지수 연산자는 단순히 가독성 때문에 생겨난 연산자인가요? (`Math.pow()`와 기능이 같나요?)
+  - 원래는 같은 알고리즘으로 동작했으나, ES2020에 `BigInt`의 등장으로 (사소한?) 차이가 생김
+  - `BigInt` 타입(클래스)은 `Math` object의 연산을 지원하지 않음
+  - 참고문서 : https://stackoverflow.com/questions/37601189/difference-between-ecmascript-2016-exponentiation-operator-and-math-pow
+```javascript
+2 ** 1024;              // -> Infinity
+Math.pow(2, 1024);      // -> Infinity
+
+2n ** 1024;             // -> Uncaught TypeError: Cannot mix BigInt and other types, use explicit conversions
+2n ** 1024n;            // -> 17976931348623159077293051907890247336179769789423…586298239947245938479716304835356329624224137216n
+Math.pow(2n, 1024n);    // -> Uncaught TypeError: Cannot convert a BigInt value to a number
+
+Number(2n ** 1024n) === Math.pow(2, 1024)   // -> true
+```
