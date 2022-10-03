@@ -62,7 +62,7 @@ switch (month) {
 console.log(monthName); // Invalid month
 ```
 
-위 예제를 실행해 보면 `'November'`가 출력되지 않고 `'Invalid month'`가 출력된다. 이는 `switch` 문의 표현식의 평가 결과와 일치하는 `case` 문으로 실행 흐름이 이동하여 문을 실행한 것은 맞지만 문을 실행한 후 `switch` 문을 탈출하지 않고 `switch` 문이 끝날 때까지 이후의 모든 `case` 문과 `default` 문을 실행했기 때문이다. 이를 **폴스루(fall through)**라 한다.
+위 예제를 실행해 보면 `'November'`가 출력되지 않고 `'Invalid month'`가 출력된다. 이는 `switch` 문의 표현식의 평가 결과와 일치하는 `case` 문으로 실행 흐름이 이동하여 문을 실행한 것은 맞지만 문을 실행한 후 `switch` 문을 탈출하지 않고 `switch` 문이 끝날 때까지 이후의 모든 `case` 문과 `default` 문을 실행했기 때문이다. 이를 **폴스루(fall through)** 라 한다.
 
 `break` 문을 생략한 폴스루가 유용한 경우도 있다. 다음 예제와 같이 폴스루를 활용해 여러 개의 `case` 문을 하나의 조건으로 사용할 수도 있다.
 ```javascript
