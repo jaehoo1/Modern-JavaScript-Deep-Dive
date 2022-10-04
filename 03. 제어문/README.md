@@ -99,3 +99,139 @@ console.log(days); // 29
 만약 `if … else` 문으로 해결할 수 있다면 `switch` 문보다 `if … else` 문을 사용하는 편이 좋다. 하지만 조건이 너무 많아서 `if … else` 문보다 `switch` 문을 사용했을 때 가독성이 더 좋다면 `switch` 문을 사용하는 편이 좋다.
 
 <br/>
+
+## 8.3 반복문
+반복문(loop statement)은 조건식의 평가 결과가 참인 경우 코드 블록을 실행한다. 그 후 조건식을 다시 평가하여 여전히 참인 경우 코드 블록을 다시 실행한다. 이는 조건식이 거짓일 때까지 반복된다.
+
+자바스크립티는 세 가지 반복문인 `for` 문, `while` 문, `do … while` 문을 제공한다.
+
+반복문을 대체할 수 있는 다양한 기능
+> 자바스크립트는 배열을 순회할 때 사용하는 `forEach` 메서드, 객체의 프로퍼티를 열거할 때 사용하는 `for … in` 문, ES6에서 도입된 이터러블을 순회할 수 있는 `for … of` 문과 같이 반복문을 대체할 수 있는 다양한 기능을 제공한다.
+
+<br/>
+
+### 8.3.1 for 문
+`for` 문은 조건식이 거짓으로 평가될 때 까지 코드 블록을 반복 실행한다. 가장 일반적으로 사용되는 `for` 문의 형태는 다음과 같다.
+```javascript
+for (변수 선언문 또는 할당문; 조건식; 증감식) {
+  조건식이 참인 경우 반복 실행될 문;
+}
+```
+
+<br/>
+
+### 8.3.2 while 문
+`while` 문은 주어진 조건식의 평가 결과가 참이면 코드 블록을 계속해서 반복 실행한다. `for` 문은 반복 횟수가 명확할 때 주로 사용하고 `while` 문은 반복 횟수가 불명확할 때 주로 사용한다.
+
+`while` 문은 조건문의 평가 결과가 거짓이 되면 코드 블록을 실행하지 않고 종료한다. 만약 조건식의 평가 결과가 불리언 값이 아니면 불리언 값으로 강제 변환하여 논리적 참, 거짓을 구별한다.
+
+<br/>
+
+### 8.3.3 do … while 문
+`do … while` 문은 코드 블록을 먼저 실행하고 조건식을 평가한다. 따라서 코드 블록은 무조건 한 번 이상 실행된다.
+
+<br/>
+
+## 8.4 break 문
+`break` 문은 레이블 문, 반복문(`for`, `for … in`, `for … of`, `while`, `do … while`) 또는 `switch` 문의 코드 블록을 탈출한다. 레이블 문, 반복문, `switch` 문의 코드 블록 외에 `break` 문을 사용하면 `SyntaxError`(문법 에러)가 발생한다.
+```javascript
+if (true) {
+  break; // Uncaught SyntaxError: Illegal break statement
+}
+```
+
+참고로 레이블 문(label statement)이란 식별자가 붙은 문을 말한다.
+```javascript
+// foo라는 레이블 식별자가 붙은 레이블 문
+foo: console.log('foo');
+```
+
+레이블 문은 프로그램의 실행 순서를 제어하는 데 사용된다. 사실 `switch` 문의 `case` 문과 `default` 문도 레이블 문이다. 레이블 문을 탈출하려면 `break` 문에 레이블 식별자를 지정한다.
+```javascript
+// foo라는 식별자가 붙은 레이블 블록문
+foo: {
+  console.log(1);
+  break foo; // foo 레이블 블록문을 탈출한다.
+  console.log(2);
+}
+
+console.log('Done!');
+```
+
+중첩된 `for` 문의 내부 `for` 문에서 `break` 문을 실행하면 내부 `for` 문을 탈출하여 외부 `for` 문으로 진입한다. 이때 내부 `for` 문이 아닌 외부 `for` 문을 탈출하려면 레이블 문을 사용한다.
+```javascript
+// outer라는 식별자가 붙은 레이블 for 문
+outer: for (var i = 0; i < 3; i++) {
+  for (var j = 0; j < 3; j++) {
+    // i + j === 3이면 outer라는 식별자가 붙은 레이블 for 문을 탈출한다.
+    if (i + j === 3) break outer;
+    console.log(`inner [${i}, ${j}]`);
+  }
+}
+
+console.log('Done!');
+```
+
+레이블 문은 중첩된 `for` 문 외부로 탈출할 때 유용하지만 그 밖의 경우에는 일반적으로 권장하지 않는다. 레이블 문을 사용하면 프로그램의 흐름이 복잡해져서 가독성이 나빠지고 오류를 발생시킬 가능성이 높아지기 때문이다.
+
+`break` 문은 레이블 문뿐 아니라 반복문, `switch` 문에서도 사용할 수 있다. 이 경우에는 `break` 문에 레이블 식별자를 지정하지 않는다. `break` 문은 반복문을 더 이상 진행하지 않아도 될 때 불필요한 반복을 회피할 수 있어 유용하다.
+
+<br/>
+
+## 8.5 continue 문
+`continue` 문은 반복문의 코드 블록 실행을 현 지점에서 중단하고 반복문의 증감식으로 실행 흐름을 이동시킨다. `break` 문처럼 반복문을 탈출하지는 않는다.
+```javascript
+var string = 'Hello World.';
+var search = 'l';
+var count = 0;
+
+// 문자열은 유사배열이므로 for 문으로 순회할 수 있다.
+for (var i = 0; i < string.length; i++) {
+  // 'l'이 아니면 현 지점에서 실행을 중단하고 반복문의 증감식으로 이동한다.
+  if (string[i] !== search) continue;
+  count++; // continue 문이 실행되면 이 문은 실행되지 않는다.
+}
+
+console.log(count); // 3
+
+// 참고로 String.prototype.match 메서드를 사용해도 같은 동작을 한다.
+const regexp = new RegExp(search, 'g');
+console.log(string.match(regexp).length); // 3
+```
+
+위 예제의 `for` 문은 다음 코드와 동일하게 동작한다.
+```javascript
+for (var i = 0; i < string.length; i++) {
+  // 'l'이면 카운트를 증가시킨다.
+  if (string[i] === search) count++;
+}
+```
+
+위와 같이 `if` 문 내에서 실행해야 할 코드가 한 줄이라면 `continue` 문을 사용했을 때보다 간편하고 가독성도 좋다. 하지만 `if` 문 내에서 실행해야 할 코드가 길다면 들여쓰기가 한 단계 더 깊어지므로 `continue` 문을 사용하는 편이 가독성이 더 좋다.
+```javascript
+// continue 문을 사용하지 않으면 if 문 내에 코드를 작성해야 한다.
+for (var i = 0; i < string.length; i++) {
+  // 'l'이면 카운트를 증가시킨다.
+  if (string[i] === search) {
+    count++;
+    // code
+    // code
+    // code
+  }
+}
+
+// continue 문을 사용하면 if 문 밖에 코드를 작성할 수 있다.
+for (var i = 0; i < string.length; i++) {
+  // 'l'이 아니면 카운트를 증가시키지 않는다.
+  if (string[i] !== search) continue;
+
+  count++;
+  // code
+  // code
+  // code
+}
+```
+
+<br/>
+
+## 공격자(질문)
