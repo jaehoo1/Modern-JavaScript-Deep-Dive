@@ -111,3 +111,88 @@ console.log(Object.getOwnPropertyDescriptors(person));
 }
 */
 ```
+
+<br/>
+
+### 16.3.2 접근자 프로퍼티
+접근자 프로퍼티(accessor property)는 자체적으로 값을 갖지 않고 다른 데이터 프로퍼티의 값을 읽거나 저장할 때 사용하는 접근자 함수(accessor function)로 구성된 프로퍼티다.
+
+접근자 프로퍼티는 다음과 같은 프로퍼티 어트리뷰트를 갖는다.
+|<center>프로퍼티<br/>어트리뷰트</center>|<center>프로퍼티 디스크립터<br/>객체의 프로퍼티</center>|<center>설명</center>|
+|---|---|---|
+|`[[Get]]`|`get`|접근자 프로퍼티를 통해 데이터 프로퍼티의 값을 읽을 때 호출되는 접근자 함수다. 즉, 접근자 프로퍼티 키로 프로퍼티 값에 접근하면 프로퍼티 어트리뷰트 `[[Get]]`의 값, 즉 getter 함수가 호출되고 그 결과가 프로퍼티 값으로 반환된다.|
+|`[[Set]]`|`set`|접근자 프로퍼티를 통해 데이터 프로퍼티의 값을 저장할 때 호출되는 접근자 함수다. 즉, 접근자 프로퍼티 키로 프로퍼티 값을 저장하면 프로퍼티 어트리뷰트 `[[Set]]`의 값, 즉 setter 함수가 호출되고 그 결과가 프로퍼티 값으로 저장된다.|
+|`[[Enumerable]]`|`enumerable`|데이터 프로퍼티의 `[[Enumerable]]`과 같다.|
+|`[[Configurable]]`|`configurable`|데이터 프로퍼티의 `[[Configurable]]`과 같다.|
+
+접근자 함수는 getter/setter 함수라고도 부른다. 접근자 프로퍼티는 getter와 setter 함수를 모두 정의할 수도 있고 하나만 정의할 수도 있다.
+```javascript
+const person = {
+  // 데이터 프로퍼티
+  firstName: 'Ungmo',
+  lastName: 'Lee',
+
+  // fullName은 접근자 함수로 구성된 접근자 프로퍼티다.
+  // getter 함수
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  },
+  // setter 함수
+  set fullName(name) {
+    // 배열 디스트럭처링 할당: "31.1 배열 디스트럭처링 할당" 참고
+    [this.firstName, this.lastName] = name.split(' ');
+  }
+};
+
+// 데이터 프로퍼티를 통한 프로퍼티 값의 참조.
+console.log(person.firstName + ' ' + person.lastName); // Ungmo Lee
+
+// 접근자 프로퍼티를 통한 프로퍼티 값의 저장
+// 접근자 프로퍼티 fullName에 값을 저장하면 setter 함수가 호출된다.
+person.fullName = 'Heegun Lee';
+console.log(person); // {firstName: "Heegun", lastName: "Lee"}
+
+// 접근자 프로퍼티를 통한 프로퍼티 값의 참조
+// 접근자 프로퍼티 fullName에 접근하면 getter 함수가 호출된다.
+console.log(person.fullName); // Heegun Lee
+
+// firstName은 데이터 프로퍼티다.
+// 데이터 프로퍼티는 [[Value]], [[Writable]], [[Enumerable]], [[Configurable]] 프로퍼티 어트리뷰트를 갖는다.
+let descriptor = Object.getOwnPropertyDescriptor(person, 'firstName');
+console.log(descriptor);
+// {value: "Heegun", writable: true, enumerable: true, configurable: true}
+
+// fullName은 접근자 프로퍼티다.
+// 접근자 프로퍼티는 [[Get]], [[Set]], [[Enumerable]], [[Configurable]] 프로퍼티 어트리뷰트를 갖는다.
+descriptor = Object.getOwnPropertyDescriptor(person, 'fullName');
+console.log(descriptor);
+// {get: ƒ, set: ƒ, enumerable: true, configurable: true}
+```
+
+`person` 객체의 `firstName`과 `lastName` 프로퍼티는 일반적인 데이터 프로퍼티다. 메서드 앞에 get, set이 붙은 메서드가 있는데 이것들이 바로 getter와 setter 함수이고, getter/setter 함수의 이름 `fullName`이 접근자 프로퍼티다. 접근자 프로퍼티는 자체적으로 값(프로퍼티 어트리뷰트 `[[Value]]`)을 가지지 않으며 다만 데이터 프로퍼티의 값을 읽거나 저장할 때 관여할 뿐이다.
+
+이를 내부 슬롯/메서드 관점에서 설명하면 다음과 같다. 접근자 프로퍼티 `fullName`으로 프로퍼티 값에 접근하면 내부적으로 `[[Get]]` 내부 메서드가 호출되어 다음과 같이 동작한다.
+1. 프로퍼티 키가 유효한지 확인한다. 프로퍼티 키는 문자열 또는 심벌이어야 한다. 프로퍼티 키 `"fullName"`은 문자열이므로 유효한 프로퍼티 키다.
+2. 프로토타입 체인에서 프로퍼티를 검색한다. `person` 객체에 `fullName` 프로퍼티가 존재한다.
+3. 검색된 `fullName` 프로퍼티가 데이터 프로퍼티인지 접근자 프로퍼티인지 확인한다. `fullName` 프로퍼티는 접근자 프로퍼티다.
+4. 접근자 프로퍼티 `fullName`의 프로퍼티 어트리뷰트 `[[Get]]`의 값, 즉 getter 함수를 호출하여 그 결과를 반환한다. 프로퍼티 `fullName`의 프로퍼티 어트리뷰트 `[[Get]]`의 값은 `Object.getOwnPropertyDescriptor` 메서드가 반환하는 프로퍼티 디스크립터(PropertyDescriptor) 객체의 get 프로퍼티 값과 같다.
+
+> ECMAScript 스펙에서 정의한 `[[Get]]` 내부 메서드의 사양을 만족시키는 구현체가 자바스크립트 엔진에 존재한다는 것이 중요하지 `[[Get]]`이라는 이름으로 실제 자바스크립트 엔진이 구현되었는지는 중요하지 않다. 어차피 `[[Get]]` 내부 메서드에 직접 접근할 수도 없다.
+
+**프로토타입(prototype)**
+> 프로토타입은 어떤 객체의 상위(부모) 객체의 역할을 하는 객체다. 프로토타입은 하위(자식) 객체에게 자신의 프로퍼티와 메서드를 상속한다. 프로토타입 객체의 프로퍼티나 메서드를 상속받은 하위 객체는 자신의 프로퍼티 또는 메서드인 것처럼 자유롭게 사용할 수 있다.
+>
+> 프로토타입 체인은 프로토타입이 단방향 링크드 리스트 형태로 연결되어 있는 상속 구조를 말한다. 객체의 프로퍼티나 메서드에 접근하려고 할 때 해당 객체에 접근하려는 프로퍼티 또는 메서드가 없다면 프로토타입 체인을 따라 프로토타입의 프로퍼티나 메서드를 차례대로 검색한다. 프로토타입과 프로토타입 체인에 대해서는 19장 "프로토타입"에서 자세히 살펴보도록 하자.
+
+접근자 프로퍼티와 데이터 프로퍼티를 구별하는 방법은 다음과 같다.
+```javascript
+// 일반 객체의 __proto__는 접근자 프로퍼티다.
+Object.getOwnPropertyDescriptor(Object.prototype, '__proto__');
+// {get: ƒ, set: ƒ, enumerable: false, configurable: true}
+
+// 함수 객체의 prototype은 데이터 프로퍼티다.
+Object.getOwnPropertyDescriptor(function() {}, 'prototype');
+// {value: {...}, writable: true, enumerable: false, configurable: false}
+```
+
+`Object.getOwnPropertyDescriptor` 메서드가 반환한 프로퍼티 어트리뷰트를 객체로 표현한 프로퍼티 디스크립터 객체를 유심히 살펴보자. 접근자 프로퍼티와 데이터 프로퍼티의 프로퍼티 디스크립터 객체의 프로퍼티가 다른 것을 알 수 있다.
