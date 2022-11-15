@@ -7,7 +7,8 @@
 
 내부 슬롯과 내부 메서드는 자바스크립트 엔진의 구현 알고리즘을 설명하기 위해 ECMAScript 사양에서 사용하는 의사 프로퍼티(pseudo property)와 의사 메서드(pseudo method)다. ECMAScript 사양에 등장하는 이중 대괄호(`[[...]]`)로 감싼 이들이 내부 슬롯과 내부 메서드다.
 
-(사진 : https://262.ecma-international.org/11.0/#sec-object-internal-methods-and-internal-slots)
+![image](https://user-images.githubusercontent.com/44667299/201897654-d42c403f-e0ed-41d8-b741-6ae4be697223.png)  
+https://262.ecma-international.org/11.0/#sec-object-internal-methods-and-internal-slots
 
 내부 슬롯과 내부 메서드는 ECMAScript 사양에 정의된 대로 구현되어 자바스크립트 엔진에서 실제로 동작하지만 개발자가 직접 접근할 수 있도록 외부로 공개된 객체의 프로퍼티는 아니다. 즉, 내부 슬롯과 내부 메서드는 자바스크립트 엔진의 내부 로직이므로 원칙적으로 자바스크립트는 내부 슬롯과 내부 메서드에 직접적으로 접근하거나 호출할 수 있는 방법을 제공하지 않는다. 단, 일부 내부 슬롯과 내부 메서드에 한하여 간접적으로 접근할 수 있는 수단을 제공하기는 한다.
 
