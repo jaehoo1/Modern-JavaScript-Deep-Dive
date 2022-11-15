@@ -196,3 +196,127 @@ Object.getOwnPropertyDescriptor(function() {}, 'prototype');
 ```
 
 `Object.getOwnPropertyDescriptor` 메서드가 반환한 프로퍼티 어트리뷰트를 객체로 표현한 프로퍼티 디스크립터 객체를 유심히 살펴보자. 접근자 프로퍼티와 데이터 프로퍼티의 프로퍼티 디스크립터 객체의 프로퍼티가 다른 것을 알 수 있다.
+
+<br/>
+
+## 16.4 프로퍼티 정의
+프로퍼티 정의 : 새로운 프로퍼티를 추가하면서 프로퍼티 어트리뷰트를 명시적으로 정의하거나, 기존 프로퍼티의 프로퍼티 어트리뷰트를 재정의하는 것.  
+ex : 프로퍼티 값을 갱신 가능하도록 할 것인지, 프로퍼티를 열거 가능하도록 할 것인지, 프로퍼티를 재정의 가능하도록 할 것인지 정의  
+이를 통해 객체의 프로퍼티가 어떻게 동작해야 하는지를 명확히 정의할 수 있다.
+
+`Object.defineProperty` 메서드를 사용하면 프로퍼티의 어트리뷰트를 정의할 수 있다. 인수로는 객체의 참조와 데이터 프로퍼티의 키인 문자열, 프로퍼티 디스크립터 객체를 전달한다.
+```javascript
+const person = {};
+
+// 데이터 프로퍼티 정의
+Object.defineProperty(person, 'firstName', {
+  value: 'Ungmo',
+  writable: true,
+  enumerable: true,
+  configurable: true
+});
+
+Object.defineProperty(person, 'lastName', {
+  value: 'Lee'
+});
+
+let descriptor = Object.getOwnPropertyDescriptor(person, 'firstName');
+console.log('firstName', descriptor);
+// firstName {value: "Ungmo", writable: true, enumerable: true, configurable: true}
+
+// 디스크립터 객체의 프로퍼티를 누락시키면 undefined, false가 기본값이다.
+descriptor = Object.getOwnPropertyDescriptor(person, 'lastName');
+console.log('lastName', descriptor);
+// lastName {value: "Lee", writable: false, enumerable: false, configurable: false}
+
+// [[Enumerable]]의 값이 false인 경우
+// 해당 프로퍼티는 for...in 문이나 Object.keys 등으로 열거할 수 없다.
+// lastName 프로퍼티는 [[Enumerable]]의 값이 false이므로 열거되지 않는다.
+console.log(Object.keys(person)); // ["firstName"]
+
+// [[Writable]]의 값이 false인 경우 해당 프로퍼티의 [[Value]]의 값을 변경할 수 없다.
+// lastName 프로퍼티는 [[Writable]]의 값이 false이므로 값을 변경할 수 없다.
+// 이때 값을 변경하면 에러는 발생하지 않고 무시된다.
+person.lastName = 'Kim';
+
+// [[Configurable]]의 값이 false인 경우 해당 프로퍼티를 삭제할 수 없다.
+// lastName 프로퍼티는 [[Configurable]]의 값이 false이므로 삭제할 수 없다.
+// 이때 프로퍼티를 삭제하면 에러는 발생하지 않고 무시된다.
+delete person.lastName;
+
+// [[Configurable]]의 값이 false인 경우 해당 프로퍼티를 재정의할 수 없다.
+// Object.defineProperty(person, 'lastName', { enumerable: true });
+// Uncaught TypeError: Cannot redefine property: lastName
+
+descriptor = Object.getOwnPropertyDescriptor(person, 'lastName');
+console.log('lastName', descriptor);
+// lastName {value: "Lee", writable: false, enumerable: false, configurable: false}
+
+// 접근자 프로퍼티 정의
+Object.defineProperty(person, 'fullName', {
+  // getter 함수
+  get() {
+    return `${this.firstName} ${this.lastName}`;
+  },
+  // setter 함수
+  set(name) {
+    [this.firstName, this.lastName] = name.split(' ');
+  },
+  enumerable: true,
+  configurable: true
+});
+
+descriptor = Object.getOwnPropertyDescriptor(person, 'fullName');
+console.log('fullName', descriptor);
+// fullName {get: ƒ, set: ƒ, enumerable: true, configurable: true}
+
+person.fullName = 'Heegun Lee';
+console.log(person); // {firstName: "Heegun", lastName: "Lee"}
+```
+
+`Object.defineProperty` 메서드로 프로퍼티를 정의할 때 프로퍼티 디스크립터 객체의 프로퍼티를 일부 생략할 수 있다. 프로퍼티 디스크립터 객체에서 생략된 어트리뷰트는 다음과 같이 기본값이 적용된다.
+|<center>프로퍼티 디스트립터 객체의 프로퍼티</center>|<center>대응하는 프로퍼티 어트리뷰트</center>|<center>생략했을 때의 기본값</center>|
+|---|---|---|
+|`value`|`[[Value]]`|`undefined`|
+|`get`|`[[Get]]`|`undefined`|
+|`set`|`[[Set]]`|`undefined`|
+|`writable`|`[[Writable]]`|`false`|
+|`enumerable`|`[[Enumerable]]`|`false`|
+|`configurable`|`[[Configurable]]`|`false`|
+
+`Object.defineProperty` 메서드는 한번에 하나의 프로퍼티만 정의할 수 있다. `Object.defineProperties` 메서드를 사용하면 여러 개의 프로퍼티를 한 번에 정의할 수 있다.
+```javascript
+const person = {};
+
+Object.defineProperties(person, {
+  // 데이터 프로퍼티 정의
+  firstName: {
+    value: 'Ungmo',
+    writable: true,
+    enumerable: true,
+    configurable: true
+  },
+  lastName: {
+    value: 'Lee',
+    writable: true,
+    enumerable: true,
+    configurable: true
+  },
+  // 접근자 프로퍼티 정의
+  fullName: {
+    // getter 함수
+    get() {
+      return `${this.firstName} ${this.lastName}`;
+    },
+    // setter 함수
+    set(name) {
+      [this.firstName, this.lastName] = name.split(' ');
+    },
+    enumerable: true,
+    configurable: true
+  }
+});
+
+person.fullName = 'Heegun Lee';
+console.log(person); // {firstName: "Heegun", lastName: "Lee"}
+```
