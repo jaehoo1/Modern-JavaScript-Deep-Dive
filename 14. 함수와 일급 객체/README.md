@@ -65,7 +65,7 @@ function square(number) {
 console.dir(square);
 ```
 
-(사진)
+![image](https://user-images.githubusercontent.com/44667299/203054265-8e5393f9-7b9b-4e60-891b-95ee0059b49c.png)
 
 `square` 함수의 모든 프로퍼티의 프로퍼티 어트리뷰트를 `Object.getOwnPropertyDescriptors` 메서드로 확인해 보면 다음과 같다.
 ```javascript
@@ -123,7 +123,7 @@ console.log(multiply(1, 2, 3)); // 2
 
 그렇다고 초과된 인수가 그냥 버려지는 것은 아니다. 모든 인수는 암묵적으로 `arguments` 객체의 프로퍼티로 보관된다. 위 예제를 브라우저 콘솔에서 실행해보자.
 
-(사진 18-2)
+![image](https://user-images.githubusercontent.com/44667299/203055323-4e9cafc1-8f18-45b6-a2bb-09e4be7a0102.png)
 
 `arguments` 객체는 인수를 프로퍼티 값으로 소유하며 프로퍼티 키는 인수의 순서를 나타낸다. `arguments` 객체의 `callee` 프로퍼티는 호출되어 `arguments` 객체를 생성한 함수, 즉 함수 자신을 가리키고 `arguments` 객체의 `length` 프로퍼티는 인수의 개수를 가리킨다.
 
