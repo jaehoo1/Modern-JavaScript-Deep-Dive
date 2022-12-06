@@ -102,3 +102,23 @@ foo();
   // Do something...
 }());
 ```
+
+<br/>
+
+## 20.4 함수 단위로 strict mode를 적용하는 것도 피하자
+앞서 말한 바와 같이 함수 단위로 strict mode를 적용할 수도 있다. 그러나 어떤 함수는 strict mode를 적용하고 어떤 함수는 strict mode를 적용하지 않는 것은 바람직하지 않으며 모든 함수에 일일이 strict mode를 적용하는 것은 번거로운 일이다. 그리고 strict mode가 적용된 함수가 참조할 함수 외부의 컨텍스트에 strict mode를 적용하지 않는다면 이 또한 문제가 발생할 수 있다.
+```javascript
+(function () {
+  // non-strict mode
+  var lеt = 10; // 에러가 발생하지 않는다.
+
+  function foo() {
+    'use strict';
+
+    let = 20; // SyntaxError: Unexpected strict mode reserved word
+  }
+  foo();
+}());
+```
+
+따라서 strict mode는 즉시 실행 함수로 감싼 스크립트 단위로 적용하는 것이 바람직하다.
