@@ -33,3 +33,35 @@ console.log(x); // ?
 > ESLint의 설치 및 비주얼 스튜디오 코드에서 ESLint를 사용하는 방법에 대해서는 https://poiemaweb.com/eslint 를 참고
 
 strict mode의 적용 방법과 strict mode가 발생시키는 에러에 대해 간략히 살펴보자. 참고로 ES6에서 도입된 클래스와 모듈은 기본적으로 strict mode가 적용된다.
+
+<br/>
+
+## 20.2 strict mode의 적용
+strict mode를 적용하려면 전역의 선두 또는 함수 몸체의 선두에 `'use strict';`를 추가한다. 전역의 선두에 추가하면 스크립트 전체에 strict mode가 적용된다.
+```javascript
+'use strict';
+
+function foo() {
+  x = 10; // ReferenceError: x is not defined
+}
+foo();
+```
+
+함수 몸체의 선두에 추가하면 해당 함수와 중첩 함수에 strict mode가 적용된다.
+```javascript
+function foo() {
+  'use strict';
+
+  x = 10; // ReferenceError: x is not defined
+}
+foo();
+```
+
+코드의 선두에 `'use strict';`를 위치시키지 않으면 strict mode가 제대로 동작하지 않는다.
+```javascript
+function foo() {
+  x = 10; // 에러를 발생시키지 않는다.
+  'use strict';
+}
+foo();
+```
