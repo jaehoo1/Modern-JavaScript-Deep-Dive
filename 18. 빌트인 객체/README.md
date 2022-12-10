@@ -142,6 +142,115 @@ console.log(typeof num, num); // number 1.5
 
 ES6에서 새롭게 도입된 원시값인 심벌도 래퍼 객체를 생성한다. 심벌은 일반적인 원시값과는 달리 리터럴 표기법으로 생성할 수 없고 `Symbol` 함수를 통해 생성해야 하므로 다른 원시값과는 차이가 있다. 심벌에 대해서는 33장 "7번째 데이터 타입 Symbol"에서 살펴보도록 하자.
 
-이처럼 문자열, 숫자, 불리언, 심벌은 암묵적으로 생성되는 래퍼 객체에 의해 마치 객체처럼 사용할 수 있으며, 표준 빌트인 객체인 `String`, `Number`, `Boolean`, `Symbol`의 프로토타입 메서드 또는 프로퍼티를 참조할 수 있다. 따라서 `String, Number, Boolean` 생성자 함수를 `new` 연산자와 함께 호출하여 문자열, 숫자, 불리언 인스턴스를 생성할 필요가 없으며 권장하지도 않는다. `Symbol`은 생성자 함수가 아니므로 이 논의에서는 제외하도록 한다.
+이처럼 문자열, 숫자, 불리언, 심벌은 암묵적으로 생성되는 래퍼 객체에 의해 마치 객체처럼 사용할 수 있으며, 표준 빌트인 객체인 `String`, `Number`, `Boolean`, `Symbol`의 프로토타입 메서드 또는 프로퍼티를 참조할 수 있다. 따라서 `String`, `Number`, `Boolean` 생성자 함수를 `new` 연산자와 함께 호출하여 문자열, 숫자, 불리언 인스턴스를 생성할 필요가 없으며 권장하지도 않는다. `Symbol`은 생성자 함수가 아니므로 이 논의에서는 제외하도록 한다.
 
 문자열, 숫자, 불리언, 심벌 이외의 원시값, 즉 `null`과 `undefined`는 래퍼 객체를 생성하지 않는다. 따라서 `null`과 `undefined` 값을 객체처럼 사용하면 에러가 발생한다.
+
+<br/>
+
+## 21.4 전역 객체
+전역 객체(global object)는 코드가 실행되기 이전 단계에 자바스크립트 엔진에 의해 어떤 객체보다도 먼저 생성되는 특수한 객체이며, 어떤 객체에도 속하지 않은 최상위 객체다.
+
+전역 객체는 자바스크립트 환경에 따라 지칭하는 이름이 제각각이다. 브라우저 환경에서는 `window`(또는 `self`, `this`, `frames`)가 전역 객체를 가리키지만 Node.js 환경에서는 `global`이 전역 객체를 가리킨다.
+
+**`globalThis`**
+> ECMAScript2020(ES11)에서 도입된 [`globalThis`](https://262.ecma-international.org/11.0/#sec-globalthis)는 브라우저 환경과 Node.js 환경에서 전역 객체를 가리키던 다양한 식별자를 통일한 식별자다. `globalThis`는 표준 사양이므로 `ECMAScript` 표준 사양을 준수하는 모든 환경에서 사용할 수 있다.
+> ```javascript
+> // 브라우저 환경
+> globalThis === this   // true
+> globalThis === window // true
+> globalThis === self   // true
+> globalThis === frames // true
+>
+> // Node.js 환경(12.0.0 이상)
+> globalThis === this   // true
+> globalThis === global // true
+> ```
+
+전역 객체는 표준 빌트인 객체(`Object`, `String`, `Number`, `Function`, `Array` 등)와 환경에 따른 호스트 객체(클라이언트 Web API 또는 Node.js의 호스트 API), 그리고 `var` 키워드로 선언한 전역 변수와 전역 함수를 프로퍼티로 갖는다.
+
+즉, 전역 객체는 계층적 구조상 어떤 객체에도 속하지 않은 모든 빌트인 객체(표준 빌트인 객체와 호스트 빌트인 객체)의 최상위 객체다. 전역 객체가 최상위 객체라는 것은 프로토타입 상속 관계상에서 최상위 객체라는 의미가 아니다. 전역 객체 자신은 어떤 객체의 프로퍼티도 아니며 객체의 계층적 구조상 표준 빌트인 객체와 호스트 객체를 프로퍼티로 소유한다는 것을 말한다.
+
+전역 객체의 특징은 다음과 같다.
+- 전역 객체는 개발자가 의도적으로 생성할 수 없다. 즉, 전역 객체를 생성할 수 있는 생성자 함수가 제공되지 않는다.
+- 전역 객체의 프로퍼티를 참조할 때 `window`(또는 `global`)를 생략할 수 있다.
+```javascript
+// 문자열 'F'를 16진수로 해석하여 10진수로 변환하여 반환한다.
+window.parseInt('F', 16); // -> 15
+// window.parseInt는 parseInt로 호출할 수 있다.
+parseInt('F', 16); // -> 15
+
+window.parseInt === parseInt; // -> true
+```
+
+- 전역 객체는 `Object`, `String`, `Number`, `Boolean`, `Function`, `Array`, `RegExp`, `Date`, `Math`, `Promise` 같은 모든 표준 빌트인 객체를 프로퍼티로 가지고 있다.
+- 자바스크립트 실행 환경(브라우저 환경 또는 Node.js 환경)에 따라 추가적으로 프로퍼티와 메서드를 갖는다. 브라우저 환경에서는 DOM, BOM, Canvas, `XMLHttpRequest`, `fetch`, `requestAnimationFrame`, SVG, Web Storage, Web Component, Web Worker 같은 [클라이언트 사이드 Web API](https://developer.mozilla.org/ko/docs/Web/API)를 호스트 객체로 제공하고 Node.js 환경에서는 [Node.js 고유의 API](https://nodejs.org/dist/latest/docs/api/repl.html)를 호스트 객체로 제공한다.
+- `var` 키워드로 선언한 전역 변수와 선언하지 않은 변수에 값을 할당한 암묵적 전역, 그리고 전역 함수는 전역 객체의 프로퍼티가 된다.
+```javascript
+// var 키워드로 선언한 전역 변수
+var foo = 1;
+console.log(window.foo); // 1
+
+// 선언하지 않은 변수에 값을 암묵적 전역. bar는 전역 변수가 아니라 전역 객체의 프로퍼티다.
+bar = 2; // window.bar = 2
+console.log(window.bar); // 2
+
+// 전역 함수
+function baz() { return 3; }
+console.log(window.baz()); // 3
+```
+
+- `let`이나 `const` 키워드로 선언한 전역 변수는 전역 객체의 프로퍼티가 아니다. 즉, `window.foo`와 같이 접근할 수 없다. `let`이나 `const` 키워드로 선언한 전역 변수는 보이지 않는 개념적인 블록(전역 렉시컬 환경의 선언적 환경 레코드)내에 존재하게 된다.
+```javascript
+let foo = 123;
+console.log(window.foo); // undefined
+```
+
+- 브라우저 환경의 모든 자바스크립트 코드는 하나의 전역 객체 `window`를 공유한다. 여러 개의 `script` 태그를 통해 자바스크립트 코드를 분리해도 하나의 전역 객체 `window`를 공유하는 것은 변함이 없다. 이는 분리되어 있는 자바스크립트 코드가 하나의 전역을 공유한다는 의미다.
+
+전역 객체는 몇 가지 프로퍼티와 메서드를 가지고 있다. 전역 객체의 프로퍼티와 메서드는 전역 객체를 가리키는 식별자, 즉 `window`나 `global`을 생략하여 참조/호출할 수 있으므로 전역 변수와 전역 함수처럼 사용할 수 있다. 이에 대해 살펴보자.
+
+<br/>
+
+### 21.4.1 빌트인 전역 프로퍼티
+빌트인 전역 프로퍼티(built-in global property)는 전역 객체의 프로퍼티를 의미한다. 주로 애플리케이션 전역에서 사용하는 값을 제공한다.
+
+<br/>
+
+### `Infinity`
+`Infinity` 프로퍼티는 무한대를 나타내는 숫자값 `Infinity`를 갖는다.
+```javascript
+// 전역 프로퍼티는 window를 생략하고 참조할 수 있다.
+console.log(window.Infinity === Infinity); // true
+
+// 양의 무한대
+console.log(3/0);  // Infinity
+// 음의 무한대
+console.log(-3/0); // -Infinity
+// Infinity는 숫자값이다.
+console.log(typeof Infinity); // number
+```
+
+<br/>
+
+### `NaN`
+`NaN` 프로퍼티는 숫자가 아님(Not-a-Number)을 나타내는 숫자값 `NaN`을 갖는다. `NaN` 프로퍼티는 `Number.NaN` 프로퍼티와 같다.
+```javascript
+console.log(window.NaN); // NaN
+
+console.log(Number('xyz')); // NaN
+console.log(1 * 'string');  // NaN
+console.log(typeof NaN);    // number
+```
+
+<br/>
+
+### `undefined`
+`undefined` 프로퍼티는 원시 타입으로 `undefined`를 값으로 갖는다.
+```javascript
+console.log(window.undefined); // undefined
+
+var foo;
+console.log(foo); // undefined
+console.log(typeof undefined); // undefined
+```
