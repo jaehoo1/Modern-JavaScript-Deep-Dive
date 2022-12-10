@@ -667,3 +667,65 @@ dec = decodeURI(enc);
 console.log(dec);
 // name=이웅모&job=programmer&teacher
 ```
+
+<br/>
+
+### 21.4.3 암묵적 전역
+먼저 다음 예제를 살펴보자.
+```javascript
+var x = 10; // 전역 변수
+
+function foo () {
+  // 선언하지 않은 식별자에 값을 할당
+  y = 20; // window.y = 20;
+}
+foo();
+
+// 선언하지 않은 식별자 y를 전역에서 참조할 수 있다.
+console.log(x + y); // 30
+```
+
+`foo` 함수 내의 `y`는 선언하지 않은 식별자다. 따라서 `y = 20`이 실행되면 참조 에러가 발생할 것처럼 보인다. 하지만 선언하지 않은 식별자 `y`는 마치 선언된 전역 변수처럼 동작한다. 이는 선언하지 않은 식별자에 값을 할당하면 전역 객체의 프로퍼티가 되기 때문이다.
+
+`foo` 함수가 호출되면 자바스크립트 엔진은 `y` 변수에 값을 할당하기 위해 먼저 스코프 체인을 통해 선언된 변수인지 확인한다. 이때 `foo` 함수의 스코프와 전역 스코프 어디에서도 `y` 변수의 선언을 찾을 수 없으므로 참조 에러가 발생한다. 하지만 자바스크립트 엔진은 `y = 20`을 `window.y = 20`으로 해석하여 전역 객체에 프로퍼티를 동적 생성한다. 결국 `y`는 전역 객체의 프로퍼티가 되어 마치 전역 변수처럼 동작한다. 이러한 현상을 **암묵적 전역(implicit global)** 이라 한다.
+
+하지만 `y`는 변수 선언 없이 단지 전역 객체의 프로퍼티로 추가되었을 뿐이다. 따라서 `y`는 변수가 아니다. `y`는 변수가 아니므로 변수 호이스팅이 발생하지 않는다.
+```javascript
+// 전역 변수 x는 호이스팅이 발생한다.
+console.log(x); // undefined
+// 전역 변수가 아니라 단지 전역 객체의 프로퍼티인 y는 호이스팅이 발생하지 않는다.
+console.log(y); // ReferenceError: y is not defined
+
+var x = 10; // 전역 변수
+
+function foo () {
+  // 선언하지 않은 식별자에 값을 할당
+  y = 20; // window.y = 20;
+}
+foo();
+
+// 선언하지 않은 식별자 y를 전역에서 참조할 수 있다.
+console.log(x + y); // 30
+```
+
+또한 변수가 아니라 단지 프로퍼티인 `y`는 `delete` 연산자로 삭제할 수 있다. 전역 변수는 프로퍼티이지만 `delete` 연산자로 삭제할 수 없다.
+```javascript
+var x = 10; // 전역 변수
+
+function foo () {
+  // 선언하지 않은 식별자에 값을 할당
+  y = 20; // window.y = 20;
+  console.log(x + y);
+}
+
+foo(); // 30
+
+console.log(window.x); // 10
+console.log(window.y); // 20
+
+delete x; // 전역 변수는 삭제되지 않는다.
+delete y; // 프로퍼티는 삭제된다.
+
+console.log(window.x); // 10
+console.log(window.y); // undefined
+```
