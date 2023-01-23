@@ -385,3 +385,38 @@ console.log(Person.prototype.getName()); // ② Kim
 ②의 경우 `getName` 메서드를 호출한 객체는 `Person.prototype`이다. `Person.prototype`도 객체이므로 직접 메서드를 호출할 수 있다. 따라서 `getName` 메서드 내부의 `this`는 `Person.prototype`을 가리키며 `this.name`은 `'Kim'`이다.
 
 (그림 22-3)
+
+<br/>
+
+### 22.2.3 생성자 함수 호출
+생성자 함수 내부의 `this`에는 생성자 함수가 (미래에) 생성할 인스턴스가 바인딩된다.
+```javascript
+// 생성자 함수
+function Circle(radius) {
+  // 생성자 함수 내부의 this는 생성자 함수가 생성할 인스턴스를 가리킨다.
+  this.radius = radius;
+  this.getDiameter = function () {
+    return 2 * this.radius;
+  };
+}
+
+// 반지름이 5인 Circle 객체를 생성
+const circle1 = new Circle(5);
+// 반지름이 10인 Circle 객체를 생성
+const circle2 = new Circle(10);
+
+console.log(circle1.getDiameter()); // 10
+console.log(circle2.getDiameter()); // 20
+```
+
+[17.2절 "생성자 함수"](https://github.com/jaehoo1/Modern-JavaScript-Deep-Dive/tree/main/13.%20%EC%83%9D%EC%84%B1%EC%9E%90%20%ED%95%A8%EC%88%98%EC%97%90%20%EC%9D%98%ED%95%9C%20%EA%B0%9D%EC%B2%B4%20%EC%83%9D%EC%84%B1#172-%EC%83%9D%EC%84%B1%EC%9E%90-%ED%95%A8%EC%88%98)에서 살펴보았듯이 생성자 함수는 이름 그대로 객체(인스턴스)를 생성하는 함수다. 일반 함수와 동일한 방법으로 생성자 함수를 정의하고 `new` 연산자와 함께 호출하면 해당 함수는 생성자 함수로 동작한다. 만약 `new` 연산자와 함께 생성자 함수를 호출하지 않으면 생성자 함수가 아니라 일반 함수로 동작한다.
+```javascript
+// new 연산자와 함께 호출하지 않으면 생성자 함수로 동작하지 않는다. 즉, 일반적인 함수의 호출이다.
+const circle3 = Circle(15);
+
+// 일반 함수로 호출된 Circle에는 반환문이 없으므로 암묵적으로 undefined를 반환한다.
+console.log(circle3); // undefined
+
+// 일반 함수로 호출된 Circle 내부의 this는 전역 객체를 가리킨다.
+console.log(radius); // 15
+```
