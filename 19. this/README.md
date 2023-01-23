@@ -420,3 +420,151 @@ console.log(circle3); // undefined
 // 일반 함수로 호출된 Circle 내부의 this는 전역 객체를 가리킨다.
 console.log(radius); // 15
 ```
+
+<br/>
+
+### 22.2.4 Function.prototype.apply/call/bind 메서드에 의한 간접 호출
+`apply`, `call`, `bind` 메서드는 `Function.prototype`의 메서드다. 즉, 이들 메서드는 모든 함수가 상속받아 사용할 수 있다.
+
+(그림 22-4)
+
+`Function.prototype.apply`, `Function.prototype.call` 메서드는 `this`로 사용할 객체와 인수 리스트를 인수로 전달받아 함수를 호출한다. `apply`와 `call` 메서드의 사용법은 다음과 같다.
+```javascript
+/**
+ * 주어진 this 바인딩과 인수 리스트 배열을 사용하여 함수를 호출한다.
+ * @param thisArg - this로 사용할 객체
+ * @param argsArray - 함수에게 전달할 인수 리스트의 배열 또는 유사 배열 객체
+ * @returns 호출된 함수의 반환값
+ */
+Function.prototype.apply(thisArg[, argsArray])
+
+/**
+ * 주어진 this 바인딩과 ,로 구분된 인수 리스트를 사용하여 함수를 호출한다.
+ * @param thisArg - this로 사용할 객체
+ * @param arg1, arg2, ... - 함수에게 전달할 인수 리스트
+ * @returns 호출된 함수의 반환값
+ */
+Function.prototype.call (thisArg[, arg1[, arg2[, ...]]])
+```
+
+다음 예제를 살펴보자.
+```javascript
+function getThisBinding() {
+  return this;
+}
+
+// this로 사용할 객체
+const thisArg = { a: 1 };
+
+console.log(getThisBinding()); // window
+
+// getThisBinding 함수를 호출하면서 인수로 전달한 객체를 getThisBinding 함수의 this에 바인딩한다.
+console.log(getThisBinding.apply(thisArg)); // {a: 1}
+console.log(getThisBinding.call(thisArg)); // {a: 1}
+```
+
+**`apply`와 `call` 메서드의 본질적인 기능은 함수를 호출하는 것이다.** `apply`와 `call` 메서드는 함수를 호출하면서 첫 번째 인수로 전달한 특정 객체를 호출한 함수의 `this`에 바인딩한다.
+
+`apply`와 `call` 메서드는 호출할 함수에 인수를 전달하는 방식만 다를 뿐 동일하게 동작한다. 위 예제는 호출할 함수, 즉 `getThisBinding` 함수에 인수를 전달하지 않는다. `apply`와 `call` 메서드를 통해 `getThisBinding` 함수를 호출하면서 인수를 전달해보자.
+```javascript
+function getThisBinding() {
+  console.log(arguments);
+  return this;
+}
+
+// this로 사용할 객체
+const thisArg = { a: 1 };
+
+// getThisBinding 함수를 호출하면서 인수로 전달한 객체를 getThisBinding 함수의 this에 바인딩한다.
+// apply 메서드는 호출할 함수의 인수를 배열로 묶어 전달한다.
+console.log(getThisBinding.apply(thisArg, [1, 2, 3]));
+// Arguments(3) [1, 2, 3, callee: ƒ, Symbol(Symbol.iterator): ƒ]
+// {a: 1}
+
+// call 메서드는 호출할 함수의 인수를 쉼표로 구분한 리스트 형식으로 전달한다.
+console.log(getThisBinding.call(thisArg, 1, 2, 3));
+// Arguments(3) [1, 2, 3, callee: ƒ, Symbol(Symbol.iterator): ƒ]
+// {a: 1}
+```
+
+`apply` 메서드는 호출할 함수의 인수를 배열로 묶어 전달한다. `call` 메서드는 호출할 함수의 인수를 쉼표로 구분한 리스트 형식으로 전달한다. 이처럼 `apply`와 `call` 메서드는 호출할 함수에 인수를 전달하는 방식만 다를 뿐 `this`로 사용할 객체를 전달하면서 함수를 호출하는 것은 동일하다.
+
+`apply`와 `call` 메서드의 대표적인 용도는 `arguments` 객체와 같은 유사 배열 객체에 배열 메서드를 사용하는 경우다. `arguments` 객체는 배열이 아니기 때문에 `Array.prototype.slice` 같은 배열의 메서드를 사용할 수 없으나 `apply`와 `call` 메서드를 이용하면 가능하다.
+```javascript
+function convertArgsToArray() {
+  console.log(arguments);
+
+  // arguments 객체를 배열로 변환
+  // Array.prototype.slice를 인수없이 호출하면 배열의 복사본을 생성한다.
+  const arr = Array.prototype.slice.call(arguments);
+  // const arr = Array.prototype.slice.apply(arguments);
+  console.log(arr);
+
+  return arr;
+}
+
+convertArgsToArray(1, 2, 3); // [1, 2, 3]
+```
+
+아직 배열에 대해 살펴보지 않았기 때문에 지금은 위 예제를 이해하지 못해도 좋다. 27장 "배열"에서 다시 자세히 살펴보도록 하자. 참고로 ES6의 36장 "디스트럭처링 할당"에서도 이에 대해 언급할 것이다.
+
+`Function.prototype.bind` 메서드는 `apply`와 `call` 메서드와 달리 함수를 호출하지 않는다. 다만 첫 번째 인수로 전달한 값으로 `this` 바인딩이 교체된 함수를 새롭게 생성해 반환한다.
+```javascript
+function getThisBinding() {
+  return this;
+}
+
+// this로 사용할 객체
+const thisArg = { a: 1 };
+
+// bind 메서드는 첫 번째 인수로 전달한 thisArg로 this 바인딩이 교체된
+// getThisBinding 함수를 새롭게 생성해 반환한다.
+console.log(getThisBinding.bind(thisArg)); // getThisBinding
+// bind 메서드는 함수를 호출하지는 않으므로 명시적으로 호출해야 한다.
+console.log(getThisBinding.bind(thisArg)()); // {a: 1}
+```
+
+`bind` 메서드는 메서드의 `this`와 메서드 내부의 중첩 함수 또는 콜백 함수의 `this`가 불일치하는 문제를 해결하기 위해 유용하게 사용된다. 다음 에제를 살펴보자.
+```javascript
+const person = {
+  name: 'Lee',
+  foo(callback) {
+    // ①
+    setTimeout(callback, 100);
+  }
+};
+
+person.foo(function () {
+  console.log(`Hi! my name is ${this.name}.`); // ② Hi! my name is .
+  // 일반 함수로 호출된 콜백 함수 내부의 this.name은 브라우저 환경에서 window.name과 같다.
+  // 브라우저 환경에서 window.name은 브라우저 창의 이름을 나타내는 빌트인 프로퍼티이며 기본값은 ''이다.
+  // Node.js 환경에서 this.name은 undefined다.
+});
+```
+
+`person.foo`의 콜백 함수가 호출되기 이전인 ①의 시점에서 `this`는 `foo` 메서드를 호출한 객체, 즉 `person` 객체를 가리킨다. 그러나 `person.foo`의 콜백 함수가 일반 함수로서 호출된 ②의 시점에서 `this`는 전역 객체 `window`를 가리킨다. 따라서 `person.foo`의 콜백 함수 내부에서 `this.name`은 `window.name`과 같다.
+
+이때 위 예제에서 `person.foo`의 콜백 함수는 외부 함수 `person.foo`를 돕는 헬퍼 함수(보조 함수) 역할을 하기 때문에 외부 함수 `person.foo` 내부의 `this`와 콜백 함수 내부의 `this`가 상이하면 문맥상 문제가 발생한다.
+
+따라서 콜백 함수 내부의 `this`를 외부 함수 내부의 `this`와 일치시켜야 한다. 이때 `bind` 메서드를 사용하여 `this`를 일치시킬 수 있다.
+```javascript
+const person = {
+  name: 'Lee',
+  foo(callback) {
+    // bind 메서드로 callback 함수 내부의 this 바인딩을 전달
+    setTimeout(callback.bind(this), 100);
+  }
+};
+
+person.foo(function () {
+  console.log(`Hi! my name is ${this.name}.`); // Hi! my name is Lee.
+});
+```
+
+지금까지 함수 호출 방식에 따라 `this` 바인딩이 동적으로 결정되는 것에 대해 살펴보았다. 이를 정리해 보면 다음과 같다.
+|<center>함수 호출 방식</center>|<center>`this` 바인딩</center>|
+|---|---|
+|일반 함수 호출|전역 객체|
+|메서드 호출|메서드를 호출한 객체|
+|생성자 함수 호출|생성자 함수가 (미래에) 생성할 인스턴스|
+|`Function.prototype.apply/call/bind` 메서드에 의한 간접 호출|`Function.prototype.apply/call/bind` 메서드에 첫 번째 인수로 전달한 객체|
