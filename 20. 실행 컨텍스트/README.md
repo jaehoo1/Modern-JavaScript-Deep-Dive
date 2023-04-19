@@ -55,23 +55,23 @@ x = 1;
 ```
 
 자바스크립트 엔진은 위 예제를 2개의 과정으로 나누어 처리한다. 먼저 소스코드 평가 과정에서 변수 선언문 `var x;`를 먼저 실행한다. 이때 생성된 변수 식별자 `x`는 실행 컨텍스트가 관리하는 스코프에 등록되고 `undefined`로 초기화된다.
-<table style="text-align: center;">
+<table>
     <tr>
-        <td colspan="2">실행 컨텍스트</td>
+        <td colspan="2" style="text-align: center;">실행 컨텍스트</td>
     </tr>
     <tr>
-        <td>x</td><td>undefined</td>
+        <td style="text-align: center;">x</td><td style="text-align: center;">undefined</td>
     </tr>
 </table>
 
 소스코드 평가 과정이 끝나면 비로소 소스코드 실행 과정이 시작된다. 변수 선언문 `var x;`는 소스코드 평가 과정에서 이미 실행이 완료되었다. 따라서 소스코드 실행 과정에서는 변수 할당문 `x = 1;`만 실행된다. 이때 `x` 변수에 값을 할당하려면 먼저 `x` 변수가 선언된 변수인지 확인해야 한다.
 
 이를 위해 실행 컨텍스트가 관리하는 스코프에 `x` 변수가 등록되어 있는지 확인한다. 다시 말해, `x` 변수가 선언된 변수인지 확인한다. 만약 `x` 변수가 실행 컨텍스트가 관리하는 스코프에 등록되어 있다면 `x` 변수는 선언된 변수, 즉 소스코드 평가 과정에서 선언문이 실행되어 등록된 변수다. `x` 변수가 선언된 변수라면 값을 할당하고 할당 결과를 실행 컨텍스트에 등록하여 관리한다.
-<table style="text-align: center;">
+<table>
     <tr>
-        <td colspan="2">실행 컨텍스트</td>
+        <td colspan="2" style="text-align: center;">실행 컨텍스트</td>
     </tr>
     <tr>
-        <td>x</td><td>1</td>
+        <td style="text-align: center;">x</td><td style="text-align: center;">1</td>
     </tr>
 </table>
